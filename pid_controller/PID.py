@@ -24,7 +24,10 @@
 # available at http://examples.oreilly.com/9780596809577/CH09/PID.py.
 #
 # Heavily modified to add most of the features and fixes described in Brett Beauregard's
-# "Improving the Beginner's PID" article (http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/)
+# "Improving the Beginner's PID" article
+#
+#    http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/
+#
 #  - All of the improvements described were made with the exception of hardcoding sample
 #    time (since invocation in the python context doesn't seem reliably precise enough, 
 #    in terms of timing), and controller direction.
@@ -39,9 +42,6 @@ class PID(object):
         instantiated all the gain variables are set to zero, so calling
         the method gen_out will just return zero.
     """
-    
-    # pylint: disable=E0202
-    #    (pylint 0.25.1 can't handle property assignment from init - see http://www.logilab.org/ticket/89786)
     
     def __init__(self):
         # initialze gains
@@ -97,8 +97,9 @@ class PID(object):
             Returns: output level actually set, or None if no output level exists
             
             Notes:
-            * actual output might be higher or lower than the parameter, if the param was >max or <min
-            * if a manual override has been previously set but is not yet the output level (because)
+            * actual output might be higher or lower than the parameter,
+                if the param was >max or <min
+            * if a manual override has been previously set but is not yet the output level
                 gen_out() has not yet been called, this will return the manually set level
         """
         if manout is not None:
@@ -129,7 +130,6 @@ class PID(object):
         self._Ci = 0   # sum of errors
         self._Cd = 0
 
-
     def gen_out(self, current_PV):
         """ Performs a PID computation and returns a control value.
         
@@ -145,11 +145,13 @@ class PID(object):
 
         ## working error variables
         error = self.setpoint - current_PV
-        self._Ci += self.Ki * (error * dt)      # add current error to accumulated error
-                                                # Ki brought in to the integral term to avoid
-                                                #  I-term bumps when tuning parameters are
-                                                #  changed
-                                                # http://brettbeauregard.com/blog/2011/04/improving-the-beginner%E2%80%99s-pid-tuning-changes/
+        self._Ci += self.Ki * (error * dt)      
+        
+        # add current error to accumulated error
+        # Ki brought in to the integral term to avoid
+        #  I-term bumps when tuning parameters are
+        #  changed
+        # http://brettbeauregard.com/blog/2011/04/improving-the-beginner%E2%80%99s-pid-tuning-changes/ pylint: disable=C0301
 
 
         # derivative computation
@@ -160,7 +162,7 @@ class PID(object):
         #  this when the setpoint changes is a feature, since it avoids spurious D term 
         #  fluctuations ("derivative kick").  
         #
-        # see http://brettbeauregard.com/blog/2011/04/improving-the-beginner%E2%80%99s-pid-derivative-kick/
+        # see http://brettbeauregard.com/blog/2011/04/improving-the-beginner%E2%80%99s-pid-derivative-kick/ pylint: disable=C0301
         dPV = current_PV - self._prev_PV          
         self._Cd = 0                             # avoid div by zero
         if dt > 0:
@@ -171,7 +173,7 @@ class PID(object):
         # constrain Ci to configured limits to avoid 'reset windup' (when the I term 
         #  grows really large as the PV slowly approaches the setpoint)
         #
-        # [From comment thread at http://brettbeauregard.com/blog/2011/04/improving-the-beginner%E2%80%99s-pid-reset-windup/]
+        # [From comment thread at http://brettbeauregard.com/blog/2011/04/improving-the-beginner%E2%80%99s-pid-reset-windup/] pylint: disable=C0301
         if self.out_max is not None:
             if (outval > self.out_max):
                 self._Ci -= outval - self.out_max

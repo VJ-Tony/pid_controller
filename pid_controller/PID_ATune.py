@@ -22,10 +22,8 @@
 
 
 import time
-import PeakCounter
 
-# TODOs (FIXME)
-# * fix docstring
+from . import PeakCounter
 
 class ControlType:
     PI, PID = range(2)
@@ -33,26 +31,28 @@ class ControlType:
 class PIDNotStableError(Exception):
     def __init__(self, arg):
         self.msg = arg
+        super(PIDNotStableError, self).__init__()
 
 class PID_ATune(object):
-    """ PID Autotune mechanism
+    """
+    PID Autotune mechanism
     
-        Based on method described at http://brettbeauregard.com/blog/2012/01/arduino-pid-autotune-library/
+        Based on method described at:
+        
+            http://brettbeauregard.com/blog/2012/01/arduino-pid-autotune-library/
         
         takes:
           measure_func - function that will return a float indicating the current value 
                           of the Process Variable (value influenced by the PID)
     """
 
-    # pylint: disable=E0202
-    #    (pylint 0.25.1 can't handle property assignment from init - see http://www.logilab.org/ticket/89786)
-
     def __init__(self, measure_func, output_func):
         ## IMPROVE: there's a better way to pass these args.  Maybe a base class?
         # measure_func must take nothing and return the current PV
         self._measure_func = measure_func
         # if given a non-None parameter, output_func will try to set the output to that 
-        # output_func always returns the current output level (after changing it, if a parameter was passed)
+        # output_func always returns the current output level (after changing it,
+        # if a parameter was passed)
         self._output_func = output_func
         
         ## configure
@@ -114,16 +114,17 @@ class PID_ATune(object):
         
             Raises PIDNotStableError if instability is detected.  Returns True if stable.
         """
-        accuracy = 0.005 ## allow 0.5% variance to still count as "stable" (IMPROVE: - make configurable?)
+        ## allow 0.5% variance to still count as "stable" (IMPROVE: - make configurable?)
+        accuracy = 0.005
         print "in verify_stability()"
         output = self._change_output(None)
         print "output is %f " % output
-        input = self._measure_func()
-        print "input is %f" % input
+        input_value = self._measure_func()
+        print "input_value is %f" % input_value
         last_check = time.time()
         for delay in (0.01, 0.1, 1.0, 10, 100):  
             now = time.time()
-            #print "delaying for %f s" % delay
+            print "delaying for %f s" % delay
             while (last_check + delay > now):
                 time.sleep((last_check + delay) - now)  # finish sleeping if we got interrupted
                 now = time.time()
@@ -131,20 +132,27 @@ class PID_ATune(object):
             #print "done sleeping"
             curr_in = self._measure_func()
 
-            if (abs(curr_in - input)/input > accuracy):
-                raise PIDNotStableError("Measured value was %f, expected %f (after %fs)" % (curr_in, input, delay))
+            if (abs(curr_in - input_value)/input_value > accuracy):
+                raise PIDNotStableError(
+                    "Measured value was %f, expected %f (after %fs)" \
+                        % (curr_in, input_value, delay))
             curr_out = self._change_output(None)
             if (curr_out != output):
-                raise PIDNotStableError("Output level changing.  Expected %d, got %d (after %fs)" % (output, curr_out, delay))
+                raise PIDNotStableError(
+                    "Output level changing.  Expected %d, got %d (after %fs)" \
+                        % (output, curr_out, delay))
 
         print "we're stable!"
         return True
     
     def Tune(self):
-        """ Run autotune logic, based on configured parameters.  Returns param tuple when complete. """
+        """
+        Run autotune logic, based on configured parameters.  Returns param tuple when complete.
+        """
 
-        ## FIXME what about the scenario where it doesn't complete? We should have some abort/timeout/give up scenario
-            ## need some informed idea of how long this might take before that's possible
+        ## FIXME what about the scenario where it doesn't complete? We should have
+        # some abort/timeout/give up scenario
+        ## need some informed idea of how long this might take before that's possible
         
         self.verify_stability()
         
@@ -158,7 +166,8 @@ class PID_ATune(object):
             if self.PC.num_peaks > self._max_peaks:
                 return self._finish_up()      
 
-            # don't run main Tune loop more often than sampleTime, but also account for other interrupts
+            # don't run main Tune loop more often than sampleTime, but also account
+            # for other interrupts
             #   that might disrupt sleep
             now = time.time()
             while (now <= last_run + self._sample_time):
@@ -214,6 +223,3 @@ class PID_ATune(object):
             return 0.075 * self._Ku * self._Pu
         else:
             return 0
-    
-    
-    

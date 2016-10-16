@@ -5,9 +5,6 @@ import time
 class PeakState:
     NONE, HIGH, LOW = range(3)
 
-# FIXME
-# docstring
-    
 class PeakCounter(object):
     """ PeakCounter is a list of numbers that is aware of its max, min, and
         number of peaks found.  Peaks are defined within a configurable window
@@ -15,17 +12,17 @@ class PeakCounter(object):
         
         It is of arbitary size, so that it can be used to count until a certain
         number of peaks has been found, if desired."""
-
-    # pylint: disable=E0202
-    #    (pylint 0.25.1 can't handle property assignment from init - see http://www.logilab.org/ticket/89786)
-
     
-    def __init__(self, max_peaks = 10):
+    def __init__(self, max_peaks=10):
         """docstring for __init__"""
         # config
-        self.lookback_size = 5        # arbitrary default - do not assume this is fit for any particular purpose (FIXME)
-        self._max_peaks = max_peaks   # current behavior is to ignore peaks > maxPeaks.  FIXME: consider
-                                    # note: only settable at construction time
+        
+        # arbitrary default - do not assume this is fit for any particular purpose (FIXME)
+        self.lookback_size = 5
+        
+        # current behavior is to ignore peaks > maxPeaks.  FIXME: consider
+        # note: only settable at construction time
+        self._max_peaks = max_peaks 
         
         # data
         self._data = []
@@ -38,7 +35,6 @@ class PeakCounter(object):
         self._state = PeakState.NONE
         self._p1_time = None    # time of most recent peak
         self._p2_time = None    # time of 2nd most recent peak
-
 
     @property
     def lookback_size(self):
@@ -135,4 +131,3 @@ class PeakCounter(object):
             return self._peaks[:self.num_peaks]
         else:
             return self._peaks[(self.num_peaks - n):self.num_peaks]
-        
