@@ -42,7 +42,7 @@ def twiddle(evaluator, tol=0.001, params=3, error_cmp=None, initial_guess=None):
     while sum(dp) > tol:
         steps += 1
         print('steps:', steps, 'tol:', tol, 'best error:', best_err)
-        for i in range(len(p)):
+        for i, _ in enumerate(p):
             
             # first try to increase param
             p[i] += dp[i]
