@@ -1,6 +1,8 @@
 PID Controller
 ==============
 
+[<img src="https://secure.travis-ci.org/chrisspen/pid_controller.png?branch=master" alt="Build Status">](https://travis-ci.org/chrisspen/pid_controller)
+
 This implements a basic pure-Pyton PID controller (http://en.wikipedia.org/wiki/PID_controller).
 
 Installation
