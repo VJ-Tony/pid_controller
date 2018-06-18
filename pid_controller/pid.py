@@ -2,8 +2,6 @@ from __future__ import print_function
 
 import time
 
-from six.moves import range
-
 def twiddle(evaluator, tol=0.001, params=3, error_cmp=None, initial_guess=None):
     """
     A coordinate descent parameter tuning algorithm.
